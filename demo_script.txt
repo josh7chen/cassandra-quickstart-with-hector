@@ -1,0 +1,76 @@
+drop keyspace demo;
+create keyspace demo 
+    with strategy_options = [{replication_factor:1}]
+    and placement_strategy = 'org.apache.cassandra.locator.SimpleStrategy';
+
+use demo;
+
+drop column family stock_close_prices;
+drop column family users;
+drop column family censor_info;
+
+
+create column family stock_close_prices 
+  with column_type = 'Standard'
+  and comparator = 'UTF8Type'
+  and default_validation_class = 'UTF8Type'
+  and key_validation_class = 'UTF8Type'
+  and column_metadata = [
+    {column_name : 'close_date',
+    validation_class : UTF8Type},
+    {column_name : 'close_price',
+    validation_class : DoubleType}];
+
+set stock_close_prices['GOOG']['2013-02-06'] = '770.17';
+set stock_close_prices['GOOG']['2013-02-05'] = '765.74';
+set stock_close_prices['GOOG']['2013-02-04'] = '759.02';
+set stock_close_prices['GOOG']['2013-02-01'] = '775.60';
+set stock_close_prices['GOOG']['2013-01-31'] = '755.69';
+set stock_close_prices['GOOG']['2013-01-30'] = '753.83';
+set stock_close_prices['GOOG']['2013-01-29'] = '753.68';
+set stock_close_prices['GOOG']['2013-01-28'] = '750.73';
+set stock_close_prices['GOOG']['2013-01-25'] = '753.67';
+set stock_close_prices['GOOG']['2013-01-24'] = '754.21';
+
+
+create column family users
+  with column_type = 'Standard'
+  and comparator = 'AsciiType'
+  and default_validation_class = 'UTF8Type'
+  and key_validation_class = 'UTF8Type'
+  and column_metadata = [
+    {column_name : 'birth_year', validation_class : LongType},
+    {column_name : 'email', validation_class : UTF8Type},
+    {column_name : 'full_name', validation_class : UTF8Type},
+    {column_name : 'gender', validation_class : UTF8Type},
+    {column_name : 'address', validation_class : UTF8Type},
+    {column_name : 'state', validation_class : UTF8Type}, 
+    {column_name : 'state', validation_class:'UTF8Type',index_name:'users_state_idx',index_type:0}];
+
+
+set users['john_smith']['birth_year'] = '1951';
+set users['john_smith']['email'] = 'john@smith.com';
+set users['john_smith']['full_name'] = 'john smith';
+set users['john_smith']['gender'] = 'male';
+set users['john_smith']['address'] = '123 main stress, Salt Lake City';
+set users['john_smith']['state'] = 'UT';
+
+set users['mary_leaman']['birth_year'] = '1972';
+set users['mary_leaman']['email'] = 'mary.leaman@yahoo.com';
+set users['mary_leaman']['full_name'] = 'mary leaman';
+set users['mary_leaman']['gender'] = 'female';
+set users['mary_leaman']['address'] = '123 market stress, San Francisco';
+set users['mary_leaman']['state'] = 'CA';
+
+set users['joe_hall']['birth_year'] = '1952';
+set users['joe_hall']['email'] = 'joe_hall@gmail.com';
+set users['joe_hall']['full_name'] = 'joe hall';
+set users['joe_hall']['gender'] = 'male';
+set users['joe_hall']['address'] = '101 N Virginia Street, NV 89501';
+set users['joe_hall']['state'] = 'NV';
+
+create column family censor_info 
+    with comparator = 'CompositeType(UTF8Type,LongType,LongType)'
+    and key_validation_class = 'UTF8Type'
+    and default_validation_class = 'UTF8Type';
+
